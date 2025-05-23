@@ -1,5 +1,6 @@
 package com.chatapp.chatapp.message;
 
+import com.chatapp.chatapp.Dto.MessageDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,9 @@ public class Messagecontroller {
     private Messageservice messageservice;
 
     @PostMapping(path = "/send")
-    public ResponseEntity<?> message(@RequestParam Integer senderId,
-                                     @RequestParam Integer receiverId,
-                                     @RequestBody Messagemodel messagemodel) {
+    public ResponseEntity<?> message(@RequestBody MessageDto messageDto) {
         try {
-            return messageservice.message(senderId, receiverId, messagemodel);
+            return messageservice.message(messageDto);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -102,6 +101,7 @@ public class Messagecontroller {
     public ResponseEntity<?> uploadAudio(@RequestParam Integer senderId,
                                          @RequestParam Integer receiverId,
                                          @RequestParam("audio") MultipartFile audio) {
+
         try {
             return messageservice.Audio(senderId, receiverId, audio);
         } catch (Exception e) {

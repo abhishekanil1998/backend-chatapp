@@ -31,6 +31,8 @@ public class Messagemodel {
     private LocalDateTime time = LocalDateTime.now();
 
 
+
+
     public String getFilePath() {
         return filePath;
     }
@@ -86,4 +88,6 @@ public class Messagemodel {
 //    public void setImage(byte[] image) {
 //        Image = image;
 //    }
+
+
 }

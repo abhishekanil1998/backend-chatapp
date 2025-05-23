@@ -1,6 +1,10 @@
 package com.chatapp.chatapp.message;
 
+import com.chatapp.chatapp.Dto.MessageDto;
+import com.chatapp.chatapp.Friend.FriendModel;
+import com.chatapp.chatapp.Friend.FriendRepo;
 import com.chatapp.chatapp.user.Usermodel;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,18 +26,36 @@ public class Messageservice {
 
     @Autowired
     private Messagerepo messagerepo;
+    @Autowired
+    private FriendRepo friendRepo;
 
     private static final String UPLOAD_DIR = "uploads/";
+    @Transactional
+    public ResponseEntity<?> message(MessageDto messageDto) {
+        // Save message
+        Messagemodel message = new Messagemodel();
+        message.setSenderId(messageDto.getSenderId());
+        message.setReceiverId(messageDto.getReceiverId());
+        message.setContent(messageDto.getContent());
+        message.setTime(LocalDateTime.now());
+        messagerepo.save(message);
 
-    public ResponseEntity<?> message(Integer senderId, Integer receiverId, Messagemodel messagemodel) {
-        Messagemodel messagemodel1 = new Messagemodel();
-        messagemodel1.setSenderId(senderId);
-        messagemodel1.setReceiverId(receiverId);
-        messagemodel1.setContent(messagemodel.getContent());
-        messagemodel1.setTime(LocalDateTime.now());
-        messagerepo.save(messagemodel1);
-        return new ResponseEntity<>(messagemodel1, HttpStatus.OK);
+        // Create friendship if requested
+            Optional<FriendModel> existing = friendRepo.findBySenderIdAndReceiverId(messageDto.getSenderId(), messageDto.getReceiverId());
+            if (existing.isEmpty()) {
+                FriendModel friend = new FriendModel();
+                friend.setSenderId(messageDto.getSenderId());
+                friend.setReceiverId(messageDto.getReceiverId());
+                friend.setFriendStatus(1); // "approved" status
+                friend.setCreatedAt(LocalDateTime.now());
+                friendRepo.save(friend);
+            }
+
+
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
+
+
 
     public ResponseEntity<?> editMessage(Integer messageId, String content, Integer senderId) {
         Optional<Messagemodel> optionalMessage = messagerepo.findByMessageIdAndSenderId(messageId, senderId);
