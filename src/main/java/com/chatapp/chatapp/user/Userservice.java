@@ -1,7 +1,10 @@
 package com.chatapp.chatapp.user;
 
 import com.chatapp.chatapp.Dto.UserDto;
+import com.chatapp.chatapp.admin.Adminmodel;
 import com.chatapp.chatapp.message.Messagerepo;
+import com.chatapp.chatapp.otppackage.OtpModel;
+import com.chatapp.chatapp.otppackage.OtpRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +22,34 @@ public class Userservice {
     @Autowired
     private Userrepo userrepo;
     private Messagerepo messagerepo;
+    @Autowired
+    private OtpRepo otpRepo;
 
-    public ResponseEntity<?> registration(Usermodel usermodel) {
+    public ResponseEntity<?> registration(Usermodel usermodel,String sessionId) {
+//        Usermodel usermodel1 = new Usermodel();
+//        usermodel1.setName(usermodel.getName());
+//        usermodel1.setMobile(usermodel.getMobile());
+//        userrepo.save(usermodel1);
+//        return new ResponseEntity<>(usermodel1, HttpStatus.OK);
+
+        OtpModel otpModel = otpRepo.findBySessionId((sessionId));
+
+        if (otpModel == null) {
+            return new ResponseEntity<>("Phone number not verified via OTP", HttpStatus.BAD_REQUEST);
+        }
+
         Usermodel usermodel1 = new Usermodel();
         usermodel1.setName(usermodel.getName());
-        usermodel1.setMobile(usermodel.getMobile());
+        usermodel1.setMobile(otpModel.getPhoneNumber());
+        usermodel1.setUserId(otpModel.getUserId());
+        usermodel1.setPassword(usermodel.getPassword());
+
+
+
+        // Set additional fields if needed
+        // usermodel1.setEmail(usermodel.getEmail());
+        // usermodel1.setPassword(usermodel.getPassword());
+
         userrepo.save(usermodel1);
         return new ResponseEntity<>(usermodel1, HttpStatus.OK);
     }
@@ -56,10 +82,10 @@ public class Userservice {
     }
 
     public ResponseEntity<?> addusername(String username, Integer userID) {
-    Optional<Usermodel>usermodelOptional =userrepo.findById(userID);
-    if (usermodelOptional.isPresent()){
-        Usermodel user = usermodelOptional.get();
-    }
+        Optional<Usermodel>usermodelOptional =userrepo.findById(userID);
+        if (usermodelOptional.isPresent()){
+            Usermodel user = usermodelOptional.get();
+        }
         return null;
     }
 
@@ -91,6 +117,23 @@ public class Userservice {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    public ResponseEntity<?> searchUser(String name) {
+        List<Usermodel> usermodels = userrepo.findByNameContainingIgnoreCase(name);
+        return new ResponseEntity<>(usermodels, HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> login(String mobile, String password) {
+        Optional<Usermodel> usermodelOptional =userrepo.findByMobileAndPassword(mobile,password);
+        if (usermodelOptional.isPresent()){
+            return new ResponseEntity<>("Loginsuccessful",HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>("Loginfailed",HttpStatus.NOT_FOUND);
+        }
+
+    }
+
 
 //    public ResponseEntity<String> deleteUser(Integer userId) {
 //        Optional<Usermodel> userOptional = userrepo.findById(userId);

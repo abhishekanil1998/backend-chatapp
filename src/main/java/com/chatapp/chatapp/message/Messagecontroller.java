@@ -1,12 +1,16 @@
 package com.chatapp.chatapp.message;
 
 import com.chatapp.chatapp.Dto.MessageDto;
+import com.chatapp.chatapp.Friend.FriendModel;
+import com.chatapp.chatapp.user.Usermodel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+@CrossOrigin
 @RestController
 @RequestMapping(path = "/api/message")
 public class Messagecontroller {
@@ -26,7 +30,7 @@ public class Messagecontroller {
 
     @GetMapping(path = "/viewmessages")
     public ResponseEntity<?> viewmessage(@RequestParam Integer senderId,
-                                     @RequestParam Integer receiverId) {
+                                         @RequestParam Integer receiverId) {
         try {
             return messageservice.viewmessage(senderId, receiverId);
         } catch (Exception e) {
@@ -34,6 +38,7 @@ public class Messagecontroller {
         }
         return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
     @PutMapping(path = "/edit")
     public ResponseEntity<?> editMessage(@RequestParam Integer messageId,
@@ -109,4 +114,14 @@ public class Messagecontroller {
         }
         return new ResponseEntity<>("Audio upload failed", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @GetMapping("/getfriends/{userId}")
+    public ResponseEntity<?> getFriendUserNames(@PathVariable Integer userId) {
+        List<Usermodel> friendUsers = messageservice.getFriendUsers(userId);
+        if (friendUsers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No friends found");
+        }
+        return ResponseEntity.ok(friendUsers);
+    }
+
 }

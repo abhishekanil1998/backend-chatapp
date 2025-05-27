@@ -4,6 +4,7 @@ import com.chatapp.chatapp.Dto.MessageDto;
 import com.chatapp.chatapp.Friend.FriendModel;
 import com.chatapp.chatapp.Friend.FriendRepo;
 import com.chatapp.chatapp.user.Usermodel;
+import com.chatapp.chatapp.user.Userrepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,8 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class Messageservice {
@@ -28,6 +29,8 @@ public class Messageservice {
     private Messagerepo messagerepo;
     @Autowired
     private FriendRepo friendRepo;
+    @Autowired
+    private Userrepo userrepo;
 
     private static final String UPLOAD_DIR = "uploads/";
     @Transactional
@@ -41,15 +44,15 @@ public class Messageservice {
         messagerepo.save(message);
 
         // Create friendship if requested
-            Optional<FriendModel> existing = friendRepo.findBySenderIdAndReceiverId(messageDto.getSenderId(), messageDto.getReceiverId());
-            if (existing.isEmpty()) {
-                FriendModel friend = new FriendModel();
-                friend.setSenderId(messageDto.getSenderId());
-                friend.setReceiverId(messageDto.getReceiverId());
-                friend.setFriendStatus(1); // "approved" status
-                friend.setCreatedAt(LocalDateTime.now());
-                friendRepo.save(friend);
-            }
+        Optional<FriendModel> existing = friendRepo.findBySenderIdAndReceiverId(messageDto.getSenderId(), messageDto.getReceiverId());
+        if (existing.isEmpty()) {
+            FriendModel friend = new FriendModel();
+            friend.setSenderId(messageDto.getSenderId());
+            friend.setReceiverId(messageDto.getReceiverId());
+            friend.setFriendStatus(1); // "approved" status
+            friend.setCreatedAt(LocalDateTime.now());
+            friendRepo.save(friend);
+        }
 
 
         return new ResponseEntity<>(message, HttpStatus.OK);
@@ -168,13 +171,29 @@ public class Messageservice {
     }
 
     public ResponseEntity<?> viewmessage(Integer senderId, Integer receiverId) {
-        Optional<Messagemodel> messagemodelOptional = messagerepo.findByMessageIdAndSenderId(senderId,receiverId);
-
-        if (messagemodelOptional.isPresent()) {
-            Messagemodel messagemodel = messagemodelOptional.get();
-            return new ResponseEntity<>(messagemodel,HttpStatus.OK);
-        }else {
-            return new ResponseEntity<>( "Messages not found",HttpStatus.NOT_FOUND);
-        }
+        List<Messagemodel> messages = messagerepo.findConversation(senderId, receiverId);
+        return ResponseEntity.ok(messages);
     }
+
+
+
+    public List<Usermodel> getFriendUsers(Integer userId) {
+        List<FriendModel> friends = friendRepo.findApprovedFriendsByUserId(userId);
+        Set<Integer> friendIds = new HashSet<>();
+
+        for (FriendModel f : friends) {
+            if (f.getSenderId().equals(userId)) {
+                friendIds.add(f.getReceiverId());
+            } else {
+                friendIds.add(f.getSenderId());
+            }
+        }
+
+        if (friendIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return userrepo.findByUserIdIn(new ArrayList<>(friendIds));
+    }
+
 }

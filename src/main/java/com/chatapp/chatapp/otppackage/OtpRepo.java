@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface OtpRepo extends JpaRepository<OtpModel,Integer> {
     Optional<OtpModel> findByPhoneNumber(String phoneNumber);
+
+    OtpModel findBySessionId(String sessionId);
 }

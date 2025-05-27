@@ -11,6 +11,10 @@ public class Usermodel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
+
+
     @Column(name = "userId")
     private Integer userId;
 
@@ -22,6 +26,8 @@ public class Usermodel {
 
     @Column(name = "Username")
     private String username;
+    @Column(name = "password")
+    private String password;
 
     public Integer getUserId() {
         return userId;
@@ -53,6 +59,22 @@ public class Usermodel {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }
 

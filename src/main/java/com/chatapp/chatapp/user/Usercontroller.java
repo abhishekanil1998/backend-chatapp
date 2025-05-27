@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin
 @RestController
 @RequestMapping(path="/Userdetails")
 public class Usercontroller {
@@ -16,9 +16,21 @@ public class Usercontroller {
     private Userservice userservice;
 
     @PostMapping(path = "/registration")
-    public ResponseEntity<?> userregistration(@RequestBody Usermodel usermodel) {
+    public ResponseEntity<?> userregistration(@RequestBody Usermodel usermodel,@RequestParam String sessionId) {
         try {
-            return userservice.registration(usermodel);
+            return userservice.registration(usermodel,sessionId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return new ResponseEntity<>("S W W", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @PostMapping(path = "/login")
+    public ResponseEntity<?> userregistration(@RequestParam String mobile,@RequestParam String password) {
+        try {
+            return userservice.login(mobile,password);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -27,7 +39,7 @@ public class Usercontroller {
         return new ResponseEntity<>("S W W", HttpStatus.INTERNAL_SERVER_ERROR);
     }
     @PutMapping (path = "/addusername")
- public ResponseEntity<?>addusername(@RequestParam String Username,@RequestParam Integer UserID)   {
+    public ResponseEntity<?>addusername(@RequestParam String Username,@RequestParam Integer UserID)   {
         try {
             return userservice.addusername(Username,UserID);
         }catch (Exception e){
@@ -67,6 +79,20 @@ public class Usercontroller {
         List<UserDto> users = userservice.getUsersByName(name);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+
+
+
+    //search user
+    @GetMapping(path = "/SearchUser")
+    public ResponseEntity<?> searchUserController(@RequestParam String name) {
+        try {
+            return userservice.searchUser(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Search failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 }
 

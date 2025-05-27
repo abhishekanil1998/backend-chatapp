@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin
 
 @RestController
 @RequestMapping(path="/Admindetails")
@@ -49,7 +49,7 @@ public class Admincontroller {
 
     @GetMapping(path = "/viewUsers")
     public ResponseEntity<List<Usermodel>> getAllUsers() {
-      return adminservice.getAllUsers();
+        return adminservice.getAllUsers();
 
     }
 
