@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-@CrossOrigin
 @RestController
 @RequestMapping(path = "/api/message")
+@CrossOrigin(origins = "*")
 public class Messagecontroller {
 
     @Autowired

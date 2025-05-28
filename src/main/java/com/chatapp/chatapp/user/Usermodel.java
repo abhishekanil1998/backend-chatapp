@@ -3,10 +3,12 @@ package com.chatapp.chatapp.user;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.boot.registry.selector.spi.StrategyCreator;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Entity
 @Table(name = "userTable")
 @Data
+@CrossOrigin(origins = "*")
 public class Usermodel {
 
     @Id

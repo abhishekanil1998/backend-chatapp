@@ -2,12 +2,14 @@ package com.chatapp.chatapp.otppackage;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "otptable")
+@CrossOrigin(origins = "*")
 public class OtpModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -16,4 +16,6 @@ public interface Userrepo extends JpaRepository<Usermodel,Integer> {
 
     Optional<Usermodel> findByMobileAndPassword(String mobile, String password);
 
+    Optional<Usermodel> findByUserId(Integer userId);
+
 }

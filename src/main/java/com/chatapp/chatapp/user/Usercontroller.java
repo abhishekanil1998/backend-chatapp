@@ -1,6 +1,8 @@
 package com.chatapp.chatapp.user;
 
+import com.chatapp.chatapp.Dto.AdminLogindto;
 import com.chatapp.chatapp.Dto.UserDto;
+import com.chatapp.chatapp.Dto.UserLoginDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,36 +10,38 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping(path="/Userdetails")
+@CrossOrigin(origins = "*")
 public class Usercontroller {
     @Autowired
     private Userservice userservice;
 
-    @PostMapping(path = "/registration")
-    public ResponseEntity<?> userregistration(@RequestBody Usermodel usermodel,@RequestParam String sessionId) {
+    @PostMapping(path = "/signup")
+    public ResponseEntity<?> userregistration(@RequestBody Usermodel usermodel, @RequestParam String sessionId) {
         try {
-            return userservice.registration(usermodel,sessionId);
+            return userservice.userregistration(usermodel, sessionId);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-
-        return new ResponseEntity<>("S W W", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
     @PostMapping(path = "/login")
-    public ResponseEntity<?> userregistration(@RequestParam String mobile,@RequestParam String password) {
+    public ResponseEntity<?>Userlogin(@RequestBody UserLoginDto userLoginDto){
         try {
-            return userservice.login(mobile,password);
+            return userservice.login(userLoginDto);
         } catch (Exception e) {
             e.printStackTrace();
+
         }
-
-
-        return new ResponseEntity<>("S W W", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("SWW", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
     @PutMapping (path = "/addusername")
     public ResponseEntity<?>addusername(@RequestParam String Username,@RequestParam Integer UserID)   {
         try {

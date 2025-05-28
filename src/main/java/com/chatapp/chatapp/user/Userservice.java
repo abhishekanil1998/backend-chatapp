@@ -1,6 +1,8 @@
 package com.chatapp.chatapp.user;
 
+import com.chatapp.chatapp.Dto.AdminLogindto;
 import com.chatapp.chatapp.Dto.UserDto;
+import com.chatapp.chatapp.Dto.UserLoginDto;
 import com.chatapp.chatapp.admin.Adminmodel;
 import com.chatapp.chatapp.message.Messagerepo;
 import com.chatapp.chatapp.otppackage.OtpModel;
@@ -9,13 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-
+@CrossOrigin(origins = "*")
 @Service
 
 public class Userservice {
@@ -25,14 +26,14 @@ public class Userservice {
     @Autowired
     private OtpRepo otpRepo;
 
-    public ResponseEntity<?> registration(Usermodel usermodel,String sessionId) {
+    public ResponseEntity<?> userregistration(Usermodel usermodel,String sessionId) {
 //        Usermodel usermodel1 = new Usermodel();
 //        usermodel1.setName(usermodel.getName());
 //        usermodel1.setMobile(usermodel.getMobile());
 //        userrepo.save(usermodel1);
 //        return new ResponseEntity<>(usermodel1, HttpStatus.OK);
 
-        OtpModel otpModel = otpRepo.findBySessionId((sessionId));
+        OtpModel otpModel = otpRepo.findBySessionId(sessionId);
 
         if (otpModel == null) {
             return new ResponseEntity<>("Phone number not verified via OTP", HttpStatus.BAD_REQUEST);
@@ -71,7 +72,7 @@ public class Userservice {
     }
 
     public ResponseEntity<?> viewProfile(Integer userId) {
-        Optional<Usermodel> userOptional = userrepo.findById(userId);
+        Optional<Usermodel> userOptional = userrepo.findByUserId(userId);
 
         if (userOptional.isPresent()) {
             Usermodel user = userOptional.get();
@@ -123,15 +124,18 @@ public class Userservice {
         return new ResponseEntity<>(usermodels, HttpStatus.OK);
     }
 
-    public ResponseEntity<?> login(String mobile, String password) {
-        Optional<Usermodel> usermodelOptional =userrepo.findByMobileAndPassword(mobile,password);
-        if (usermodelOptional.isPresent()){
-            return new ResponseEntity<>("Loginsuccessful",HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>("Loginfailed",HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<?> login(UserLoginDto userLoginDto) {
 
+        Optional<Usermodel> usermodelOptional =userrepo.findByMobileAndPassword(userLoginDto.getMobile(),userLoginDto.getPassword());
+        if (usermodelOptional.isPresent()) {
+            Integer userId = usermodelOptional.get().getUserId();
+            Map<String, Object> loginres = new HashMap<>();
+            loginres.put("message", "Login success");
+            loginres.put("userId", userId);
+            return new ResponseEntity<>(loginres, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(" User Credentials Incorrect", HttpStatus.NOT_FOUND);
+        }
     }
 
 
