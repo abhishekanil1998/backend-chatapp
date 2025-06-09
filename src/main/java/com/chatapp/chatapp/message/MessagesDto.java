@@ -1,47 +1,19 @@
 package com.chatapp.chatapp.message;
 
-import jakarta.persistence.*;
-import lombok.Data;
-
-import java.sql.Blob;
 import java.time.LocalDateTime;
 
-@Entity
-@Data
-@Table(name = "messages")
-public class Messagemodel {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+public class MessagesDto {
     private Integer messageId;
 
-    @Column(name = "sender"  )
     private Integer senderId;
 
-    @Column(name = "receiver")
     private Integer receiverId;
 
-    @Column(name = "content")
     private String content;
 
-    private String filePath; // File path for uploaded files
-
-
-    @Column(name = "time")
     private LocalDateTime time = LocalDateTime.now();
 
-
-    @Lob
-    @Column(name = "image")
     private byte[] image;
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
 
     public Integer getMessageId() {
         return messageId;
@@ -82,15 +54,6 @@ public class Messagemodel {
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
-
-//    public byte[] getImage() {
-//        return Image;
-//    }
-//
-//    public void setImage(byte[] image) {
-//        Image = image;
-//    }
-
 
     public byte[] getImage() {
         return image;

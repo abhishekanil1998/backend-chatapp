@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class Messageservice {
@@ -102,7 +101,21 @@ public class Messageservice {
         return filePath.toString();
     }
 
-    public ResponseEntity<?> Imageupload(Integer senderId, Integer receiverId, MultipartFile image) {
+    public void sendMessageWithImage(Integer senderId, Integer receiverId, MultipartFile image, String content) throws IOException {
+        Messagemodel message = new Messagemodel();
+        message.setSenderId(senderId);
+        message.setReceiverId(receiverId);
+        message.setContent(content);
+        message.setTime(LocalDateTime.now());
+
+        if (image != null && !image.isEmpty()) {
+            message.setImage(image.getBytes());  // Store image directly in DB
+        }
+
+        messagerepo.save(message);
+    }
+
+    public ResponseEntity<?> Imageupload(Integer senderId, Integer receiverId, MultipartFile image, String content) throws IOException {
         try {
             String filePath = saveFile(image);
             Messagemodel message = new Messagemodel();
@@ -110,6 +123,8 @@ public class Messageservice {
             message.setReceiverId(receiverId);
             message.setContent("Image uploaded");
             message.setFilePath(filePath);
+            message.setImage(image.getBytes());
+            message.setContent(content);
             message.setTime(LocalDateTime.now());
             messagerepo.save(message);
 
@@ -118,6 +133,7 @@ public class Messageservice {
             return new ResponseEntity<>("File upload failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     public ResponseEntity<?> Document(Integer senderId, Integer receiverId, MultipartFile document) {
         try {
@@ -172,7 +188,21 @@ public class Messageservice {
 
     public ResponseEntity<?> viewmessage(Integer senderId, Integer receiverId) {
         List<Messagemodel> messages = messagerepo.findConversation(senderId, receiverId);
-        return ResponseEntity.ok(messages);
+        List<MessagesDto> messagesDtos=new ArrayList<>();
+        if (!messages.isEmpty()) {
+            for (Messagemodel messagemodel:messages){
+                MessagesDto messagesDto=new MessagesDto();
+                messagesDto.setReceiverId(messagemodel.getReceiverId());
+                messagesDto.setImage(messagemodel.getImage());
+                messagesDto.setTime(messagemodel.getTime());
+                messagesDto.setContent(messagemodel.getContent());
+                messagesDto.setSenderId(messagemodel.getSenderId());
+                messagesDto.setMessageId(messagemodel.getMessageId());
+                messagesDtos.add(messagesDto);
+
+            }
+        }
+        return ResponseEntity.ok(messagesDtos);
     }
 
 
@@ -196,4 +226,8 @@ public class Messageservice {
         return userrepo.findByUserIdIn(new ArrayList<>(friendIds));
     }
 
+    public ResponseEntity<?> viewImages(Integer senderId, Integer receiverId) {
+        List<Messagemodel> messages = messagerepo.findConversation(senderId, receiverId);
+        return ResponseEntity.ok(messages);
+    }
 }

@@ -39,6 +39,17 @@ public class Messagecontroller {
         return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @GetMapping(path = "/viewImages")
+    public ResponseEntity<?> viewImages(@RequestParam Integer senderId,
+                                         @RequestParam Integer receiverId) {
+        try {
+            return messageservice.viewImages(senderId, receiverId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     @PutMapping(path = "/edit")
     public ResponseEntity<?> editMessage(@RequestParam Integer messageId,
@@ -64,17 +75,20 @@ public class Messagecontroller {
 
     // Upload Image
     @PostMapping("/upload/image")
-    public ResponseEntity<?> uploadImage(@RequestParam Integer senderId,
-                                         @RequestParam Integer receiverId,
-                                         @RequestParam("image") MultipartFile image) {
+    public ResponseEntity<?> uploadImageMessage(
+            @RequestParam("senderId") Integer senderId,
+            @RequestParam("receiverId") Integer receiverId,
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @RequestParam(value = "content", required = false) String content
+    ) {
         try {
-            return messageservice.Imageupload(senderId, receiverId, image);
+            messageservice.sendMessageWithImage(senderId, receiverId, image, content);
+            return ResponseEntity.ok("Message uploaded successfully");
         } catch (Exception e) {
-            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Upload failed: " + e.getMessage());
         }
-        return new ResponseEntity<>("Image upload failed", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
     // Upload Document
     @PostMapping("/upload/document")
     public ResponseEntity<?> uploadDocument(@RequestParam Integer senderId,
