@@ -42,15 +42,15 @@ public class Usercontroller {
     }
 
 
-    @PutMapping (path = "/addusername")
-    public ResponseEntity<?>addusername(@RequestParam String Username,@RequestParam Integer UserID)   {
-        try {
-            return userservice.addusername(Username,UserID);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>("Something Went Wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @PutMapping (path = "/addusername")
+//    public ResponseEntity<?>addusername(@RequestParam String Username,@RequestParam Integer UserID)   {
+//        try {
+//            return userservice.addusername(Username,UserID);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        return new ResponseEntity<>("Something Went Wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 
     @GetMapping(path = "/viewProfile")
     public ResponseEntity<?> viewProfile(@RequestParam Integer userId) {

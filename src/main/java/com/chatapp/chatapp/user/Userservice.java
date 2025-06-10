@@ -44,6 +44,8 @@ public class Userservice {
         usermodel1.setMobile(otpModel.getPhoneNumber());
         usermodel1.setUserId(otpModel.getUserId());
         usermodel1.setPassword(usermodel.getPassword());
+        usermodel1.setUsername(usermodel.getUsername());
+
 
 
 
@@ -82,13 +84,13 @@ public class Userservice {
         }
     }
 
-    public ResponseEntity<?> addusername(String username, Integer userID) {
-        Optional<Usermodel>usermodelOptional =userrepo.findById(userID);
-        if (usermodelOptional.isPresent()){
-            Usermodel user = usermodelOptional.get();
-        }
-        return null;
-    }
+//    public ResponseEntity<?> addusername(String username, Integer userID) {
+//        Optional<Usermodel>usermodelOptional =userrepo.findById(userID);
+//        if (usermodelOptional.isPresent()){
+//            Usermodel user = usermodelOptional.get();
+//        }
+//        return null;
+//    }
 
     public ResponseEntity<List<UserDto>> getallusers() {
         List<UserDto> dto =new ArrayList<>();
